@@ -1,4 +1,4 @@
-git clone https://github.com/your-username/MassiVM
+git clone https://github.com/genZrizzCode/MassiVM
 cd MassiVM
 pip install textual
 sleep 2
@@ -112,7 +112,7 @@ else
     docker run -d --name=MassiVM -e PUID=1000 -e PGID=1000 --security-opt seccomp=unconfined -e TZ=Etc/UTC -e SUBFOLDER=/ -e TITLE=MassiVM -p 3000:3000 -p 8080:8080 -p 5900:5900 --shm-size="4gb" -v $(pwd)/Save:/config -v $(pwd)/PersistentData:/home/user -v $(pwd)/UserData:/root/.local --restart unless-stopped massivm
 fi
 clear
-echo "MASSIVM WAS INSTALLED SUCCESSFULLY! Check Port Tab"
+echo "MASSIVM WAS INSTALLED SUCCESSFULLY! Check The Port Tab"
 echo "🌐 Access at: http://localhost:3000"
 echo "🖥️ VNC at: localhost:5900"
 echo "🔧 Development at: http://localhost:8080" 
