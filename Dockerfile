@@ -17,6 +17,8 @@ COPY /root/ /
 
 RUN \
   echo "**** install packages ****" && \
+  # Remove any conflicting packages that might be pre-installed
+  apt-get remove -y containerd docker.io docker-compose npm || true && \
   add-apt-repository -y ppa:mozillateam/ppa && \
   apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
@@ -40,7 +42,9 @@ RUN \
 RUN \
   echo "**** install Node.js and npm ****" && \
   curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-  apt-get install -y nodejs
+  apt-get update && \
+  apt-get install -y nodejs && \
+  npm install -g npm@latest
 
 RUN \
   echo "**** install Docker ****" && \

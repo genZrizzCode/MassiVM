@@ -150,7 +150,23 @@ if __name__ == '__main__':
     print("Press Ctrl+C to stop")
     print("")
     
-    server = HTTPServer(('localhost', port), LogHandler)
+    # Try to start server, if port is busy, try next port
+    for try_port in range(8081, 8090):
+        try:
+            server = HTTPServer(('localhost', try_port), LogHandler)
+            if try_port != 8081:
+                print(f"⚠️ Port 8081 busy, using port {try_port}")
+                print(f"🌐 Access at: http://localhost:{try_port}")
+            break
+        except OSError as e:
+            if e.errno == 98:  # Address already in use
+                continue
+            else:
+                raise e
+    else:
+        print("❌ No available ports found (8081-8089)")
+        exit(1)
+    
     try:
         server.serve_forever()
     except KeyboardInterrupt:

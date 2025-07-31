@@ -118,14 +118,24 @@ chmod +x ../view-logs.py
 
 # Start log viewer in background
 cd ..
-python3 view-logs.py &
-LOG_VIEWER_PID=$!
 
-echo "📋 Log viewer started at: http://localhost:8081"
+# Check if port 8081 is already in use
+if lsof -Pi :8081 -sTCP:LISTEN -t >/dev/null 2>&1; then
+    echo "📋 Log viewer already running at: http://localhost:8081"
+    LOG_VIEWER_PID=""
+else
+    python3 view-logs.py &
+    LOG_VIEWER_PID=$!
+    echo "📋 Log viewer started at: http://localhost:8081"
+fi
 echo ""
 
 # Clone MassiVM repository
 echo "📥 Cloning MassiVM repository..."
+if [ -d "MassiVM" ]; then
+    echo "📁 MassiVM directory already exists. Removing old version..."
+    rm -rf MassiVM
+fi
 git clone https://github.com/genZrizzCode/MassiVM
 if [ ! -d "MassiVM" ]; then
     echo "❌ Failed to clone MassiVM repository"
@@ -153,7 +163,7 @@ fi
 
 # Build Docker image
 echo "🐳 Building Docker image..."
-docker build -t massivm . --no-cache
+docker build -t massivm . --no-cache --pull
 if [ $? -ne 0 ]; then
     echo "❌ Failed to build Docker image"
     exit 1
@@ -355,7 +365,9 @@ else
 fi
 
 # Stop log viewer
-kill $LOG_VIEWER_PID 2>/dev/null || true
+if [ ! -z "$LOG_VIEWER_PID" ]; then
+    kill $LOG_VIEWER_PID 2>/dev/null || true
+fi
 
 echo ""
 echo "📋 Installation complete! View logs at: http://localhost:8081"
