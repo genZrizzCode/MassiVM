@@ -59,6 +59,35 @@ After installation:
 6. Browse the web with full functionality
 7. Develop and test applications
 
+### 📋 Logging and Troubleshooting
+
+MassiVM includes comprehensive logging to help with installation and troubleshooting:
+
+#### **Automatic Logging:**
+- **Installation Logs**: All installation output is captured to `logs/` directory
+- **Real-time Viewer**: Web-based log viewer at `http://localhost:8081` during installation
+- **Timestamped Files**: Each installation creates a unique log file
+
+#### **Viewing Logs:**
+```bash
+# View logs via web interface
+python3 view-logs.py
+
+# Access at: http://localhost:8081
+# Shows container status and all log files
+```
+
+#### **Log Files:**
+- **Location**: `logs/massivm_install_YYYYMMDD_HHMMSS.log`
+- **Content**: Complete installation output including errors
+- **Format**: Plain text, easily searchable
+
+#### **Troubleshooting:**
+- Check logs for specific error messages
+- Verify container status in log viewer
+- Review installation steps in chronological order
+- Contact support with log file contents
+
 ### 💾 Persistent Storage
 
 **Important**: GitHub Codespaces lose data when closed. MassiVM includes persistent storage features:
