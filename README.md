@@ -1,4 +1,4 @@
-# MassiVM (Modified BlobeVM)
+# MassiVM
 
 ### Installation
 
@@ -12,7 +12,7 @@ chmod +x install.sh
 
 ## About
 
-MassiVM is a modified version of [BlobeVM](https://github.com/Blobby-Boi/BlobeVM) that provides enhanced features and capabilities. It's a virtual machine that can bypass school restrictions and provide a full desktop environment in GitHub Codespaces.
+MassiVM is a powerful virtual machine that can bypass school restrictions and provide a full desktop environment in GitHub Codespaces. It offers a complete Linux desktop experience with gaming, development, and productivity tools.
 
 ### Features
 
@@ -41,12 +41,12 @@ MassiVM is a modified version of [BlobeVM](https://github.com/Blobby-Boi/BlobeVM
 
 ### How It Works
 
-MassiVM is based on BlobeVM's architecture:
+MassiVM creates a complete virtual desktop environment:
 - **Docker Container**: Runs in a containerized environment
 - **KasmVNC**: Web-based VNC access
 - **Multiple Desktop Environments**: Choose your preferred DE
 - **Port Forwarding**: Web access to applications
-- **Enhanced Package Management**: More development tools
+- **Enhanced Package Management**: Comprehensive development tools
 
 ### Usage
 
@@ -97,21 +97,29 @@ After installation:
 - ✅ **Database data** (PostgreSQL, Redis)
 - ✅ **Docker containers** and images
 
-### Key Differences from BlobeVM
+### Key Features
 
-- **Enhanced Development Tools**: VS Code, Docker, databases
-- **More Gaming Options**: Lutris, RetroArch, PlayOnLinux
-- **Additional Programming Languages**: Go, Rust support
-- **Better Package Management**: More pre-installed tools
-- **Improved Performance**: Optimized for development workflows
+- **Complete Development Environment**: VS Code, Docker, databases
+- **Comprehensive Gaming Support**: Steam, CS:GO, Minecraft, Lutris, RetroArch
+- **Multiple Programming Languages**: Node.js, Python, Go, Rust support
+- **Advanced Package Management**: Extensive pre-installed tools
+- **Optimized Performance**: Fine-tuned for development and gaming workflows
 
 ### Resources
 
-- [BlobeVM Original](https://github.com/Blobby-Boi/BlobeVM)
 - [GitHub Codespaces Documentation](https://docs.github.com/en/codespaces)
 - [KasmVNC Documentation](https://www.kasmweb.com/)
 - [Ubuntu Desktop](https://ubuntu.com/desktop)
+- [Docker Documentation](https://docs.docker.com/)
 
 ### License
 
-GPL-3.0 license (based on BlobeVM) 
+Apache License 2.0 - See [LICENSE](LICENSE) file for details.
+
+**Key Terms:**
+- ✅ **Fork and PR freely** - No restrictions on contributions
+- ✅ **Commercial use allowed** - With proper attribution
+- ✅ **Patent protection** - Includes patent license grant
+- ✅ **No liability** - Use at your own risk
+- ✅ **Credit required** - Include NOTICE file and copyright
+- ❌ **No selling** - Cannot be sold for monetary profit 
