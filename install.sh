@@ -120,17 +120,45 @@ chmod +x ../view-logs.py
 cd ..
 python3 view-logs.py &
 LOG_VIEWER_PID=$!
-cd MassiVM
 
 echo "📋 Log viewer started at: http://localhost:8081"
 echo ""
 
+# Clone MassiVM repository
+echo "📥 Cloning MassiVM repository..."
 git clone https://github.com/genZrizzCode/MassiVM
+if [ ! -d "MassiVM" ]; then
+    echo "❌ Failed to clone MassiVM repository"
+    exit 1
+fi
+
 cd MassiVM
+
+# Install Python dependencies
+echo "🐍 Installing Python dependencies..."
 pip install textual
+if [ $? -ne 0 ]; then
+    echo "❌ Failed to install textual"
+    exit 1
+fi
+
+# Run installer
+echo "⚙️ Running MassiVM installer..."
 sleep 2
 python3 installer.py
+if [ $? -ne 0 ]; then
+    echo "❌ Failed to run installer"
+    exit 1
+fi
+
+# Build Docker image
+echo "🐳 Building Docker image..."
 docker build -t massivm . --no-cache
+if [ $? -ne 0 ]; then
+    echo "❌ Failed to build Docker image"
+    exit 1
+fi
+
 cd ..
 
 sudo apt update
