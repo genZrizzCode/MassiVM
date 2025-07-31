@@ -9,8 +9,8 @@ echo "🚀 Installing MassiVM..."
 echo "========================"
 echo "📝 Logging to: $LOG_FILE"
 
-# Create simple log viewer
-cat > view-logs.py << 'EOF'
+# Create simple log viewer in parent directory
+cat > ../view-logs.py << 'EOF'
 #!/usr/bin/env python3
 import os
 import glob
@@ -114,11 +114,13 @@ if __name__ == '__main__':
         print("\n🛑 Log viewer stopped")
 EOF
 
-chmod +x view-logs.py
+chmod +x ../view-logs.py
 
 # Start log viewer in background
+cd ..
 python3 view-logs.py &
 LOG_VIEWER_PID=$!
+cd MassiVM
 
 echo "📋 Log viewer started at: http://localhost:8081"
 echo ""
@@ -329,5 +331,6 @@ kill $LOG_VIEWER_PID 2>/dev/null || true
 
 echo ""
 echo "📋 Installation complete! View logs at: http://localhost:8081"
-echo "💡 To view logs later, run: python3 view-logs.py"
+echo "💡 To view logs later, run: python3 view-logs.py (from parent directory)"
+echo "📁 Log files are in: $(pwd)/logs/"
 echo "" 

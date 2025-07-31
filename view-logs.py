@@ -5,6 +5,33 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from datetime import datetime
 
+def find_logs_directory():
+    """Find the logs directory by searching common locations"""
+    current_dir = os.getcwd()
+    
+    # Check current directory
+    if os.path.exists('logs'):
+        return 'logs'
+    
+    # Check parent directory
+    parent_dir = os.path.dirname(current_dir)
+    if os.path.exists(os.path.join(parent_dir, 'logs')):
+        return os.path.join(parent_dir, 'logs')
+    
+    # Check MassiVM subdirectory
+    massivm_dir = os.path.join(current_dir, 'MassiVM')
+    if os.path.exists(os.path.join(massivm_dir, 'logs')):
+        return os.path.join(massivm_dir, 'logs')
+    
+    # Check if we're in MassiVM directory
+    if os.path.basename(current_dir) == 'MassiVM' and os.path.exists('logs'):
+        return 'logs'
+    
+    # Create logs directory if not found
+    logs_dir = os.path.join(current_dir, 'logs')
+    os.makedirs(logs_dir, exist_ok=True)
+    return logs_dir
+
 class LogHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/':
@@ -12,8 +39,11 @@ class LogHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             
+            # Find logs directory
+            logs_dir = find_logs_directory()
+            
             # Get all log files
-            log_files = glob.glob('logs/*.log')
+            log_files = glob.glob(os.path.join(logs_dir, '*.log'))
             log_files.sort(reverse=True)
             
             html = '''
@@ -36,6 +66,7 @@ class LogHandler(BaseHTTPRequestHandler):
                     .status { text-align: center; margin: 10px 0; padding: 10px; border-radius: 4px; }
                     .status.running { background: #d4edda; color: #155724; }
                     .status.stopped { background: #f8d7da; color: #721c24; }
+                    .info { background: #e7f3ff; color: #0c5460; padding: 10px; border-radius: 4px; margin: 10px 0; }
                 </style>
             </head>
             <body>
@@ -43,6 +74,9 @@ class LogHandler(BaseHTTPRequestHandler):
                     <h1>📋 MassiVM Installation Logs</h1>
                     <div class="refresh">
                         <a href="/">🔄 Refresh Logs</a>
+                    </div>
+                    <div class="info">
+                        📁 Logs directory: <strong>''' + logs_dir + '''</strong>
                     </div>
             '''
             
@@ -86,7 +120,8 @@ class LogHandler(BaseHTTPRequestHandler):
             
         elif self.path.startswith('/log/'):
             log_name = self.path[5:]  # Remove '/log/'
-            log_path = f'logs/{log_name}'
+            logs_dir = find_logs_directory()
+            log_path = os.path.join(logs_dir, log_name)
             
             if os.path.exists(log_path):
                 self.send_response(200)
@@ -107,7 +142,10 @@ class LogHandler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     port = 8081
+    logs_dir = find_logs_directory()
+    
     print(f"📋 MassiVM Log Viewer")
+    print(f"📁 Logs directory: {logs_dir}")
     print(f"🌐 Access at: http://localhost:{port}")
     print("Press Ctrl+C to stop")
     print("")

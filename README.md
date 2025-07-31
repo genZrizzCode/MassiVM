@@ -70,7 +70,7 @@ MassiVM includes comprehensive logging to help with installation and troubleshoo
 
 #### **Viewing Logs:**
 ```bash
-# View logs via web interface
+# View logs via web interface (from parent directory)
 python3 view-logs.py
 
 # Access at: http://localhost:8081
