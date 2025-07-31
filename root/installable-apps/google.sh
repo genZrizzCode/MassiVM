@@ -1,23 +1,8 @@
 #!/bin/bash
 echo "**** Installing Google as Default Browser ****"
 
-# Install multiple browsers for compatibility
-sudo apt-get update
-sudo apt-get install -y \
-    firefox \
-    chromium-browser \
-    google-chrome-stable \
-    wget \
-    curl
-
-# Download and install Google Chrome (if not already installed)
-if ! command -v google-chrome &> /dev/null; then
-    echo "Installing Google Chrome..."
-    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-    sudo apt-get update
-    sudo apt-get install -y google-chrome-stable
-fi
+# Browsers are already installed in Dockerfile
+echo "Browsers already installed. Configuring Google as default..."
 
 # Set Google as default search engine and homepage for all browsers
 echo "Setting Google as default search engine..."

@@ -1,6 +1,4 @@
 #!/bin/bash
-sudo apt-get update
-sudo apt-get install -y docker.io docker-compose
-sudo usermod -aG docker $USER
-sudo systemctl enable docker
-sudo systemctl start docker 
+# Docker is already installed in Dockerfile
+# Docker-in-Docker requires special setup
+echo "Docker client installed. For Docker-in-Docker, use --privileged flag when running container." 

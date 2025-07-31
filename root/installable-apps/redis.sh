@@ -1,5 +1,4 @@
 #!/bin/bash
-sudo apt-get update
-sudo apt-get install -y redis-server
-sudo systemctl enable redis-server
-sudo systemctl start redis-server 
+# Redis tools are already installed in Dockerfile
+# For full Redis server, use Docker or external service
+echo "Redis tools installed. For full server, use external Redis or Docker container." 

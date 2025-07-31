@@ -22,7 +22,6 @@ RUN \
   DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     firefox \
     chromium-browser \
-    google-chrome-stable \
     jq \
     wget \
     curl \
@@ -34,24 +33,39 @@ RUN \
     npm \
     docker.io \
     docker-compose \
-    postgresql \
-    mysql-server \
-    redis-server \
+    postgresql-client \
+    redis-tools \
     golang-go \
-    rustc \
-    cargo \
-    steam \
-    wine \
-    lutris \
-    playonlinux \
-    retroarch \
-    code \
     vim \
     nano \
     htop \
     tree \
+    software-properties-common \
     && chmod +x /install-de.sh && \
     /install-de.sh
+
+RUN \
+  echo "**** install additional packages ****" && \
+  # Install Rust
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+  . $HOME/.cargo/env && \
+  # Install VS Code
+  wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg && \
+  install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/ && \
+  sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list' && \
+  apt-get update && \
+  apt-get install -y code && \
+  # Install Google Chrome
+  wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+  sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' && \
+  apt-get update && \
+  apt-get install -y google-chrome-stable && \
+  # Install gaming packages
+  apt-get install -y wine64 && \
+  # Install development tools
+  apt-get install -y rustc cargo && \
+  # Clean up
+  rm -f packages.microsoft.gpg
 
 RUN \
   chmod +x /installapps.sh && \
