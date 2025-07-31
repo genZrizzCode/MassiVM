@@ -9,8 +9,8 @@ echo "🚀 Installing MassiVM..."
 echo "========================"
 echo "📝 Logging to: $LOG_FILE"
 
-# Create simple log viewer in parent directory
-cat > ../view-logs.py << 'EOF'
+# Create simple log viewer in current directory
+cat > view-logs.py << 'EOF'
 #!/usr/bin/env python3
 import os
 import glob
@@ -114,11 +114,9 @@ if __name__ == '__main__':
         print("\n🛑 Log viewer stopped")
 EOF
 
-chmod +x ../view-logs.py
+chmod +x view-logs.py
 
 # Start log viewer in background
-cd ..
-
 # Check if port 8081 is already in use
 if lsof -Pi :8081 -sTCP:LISTEN -t >/dev/null 2>&1; then
     echo "📋 Log viewer already running at: http://localhost:8081"
