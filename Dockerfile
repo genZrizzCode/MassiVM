@@ -44,7 +44,7 @@ RUN \
   curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
   apt-get update && \
   apt-get install -y nodejs && \
-  npm install -g npm@latest
+  npm install -g npm@10.8.2
 
 RUN \
   echo "**** install Docker ****" && \
