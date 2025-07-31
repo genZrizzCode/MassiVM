@@ -142,6 +142,10 @@ fi
 
 cd MassiVM
 
+# Fix Node.js version in Dockerfile for compatibility
+echo "🔧 Fixing Node.js version for compatibility..."
+sed -i 's/setup_20.x/setup_18.x/g' Dockerfile
+
 # Install Python dependencies
 echo "🐍 Installing Python dependencies..."
 pip install textual
