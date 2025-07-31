@@ -185,6 +185,12 @@ mkdir -p UserData
 # Copy configuration files
 cp -r MassiVM/root/config/* Save
 
+# Copy update scripts to container
+cp update-checker.py Save/
+cp update-notifier.py Save/
+chmod +x Save/update-checker.py
+chmod +x Save/update-notifier.py
+
 # Create persistent data structure
 mkdir -p PersistentData/{home,steam,downloads,documents,pictures,music,videos,projects}
 

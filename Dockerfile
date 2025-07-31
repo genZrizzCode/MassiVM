@@ -36,6 +36,15 @@ RUN \
     htop \
     tree \
     software-properties-common \
+    libfontconfig1-dev \
+    pkg-config \
+    libfreetype6-dev \
+    libx11-dev \
+    libxrandr-dev \
+    libxcb1-dev \
+    libxcb-render0-dev \
+    libxcb-shape0-dev \
+    libxcb-xfixes0-dev \
     && chmod +x /install-de.sh && \
     /install-de.sh
 
@@ -69,22 +78,25 @@ RUN \
 
 RUN \
   echo "**** install additional packages ****" && \
-  # Install Rust
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+  # Install Rust with latest stable version
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable && \
   . $HOME/.cargo/env && \
+  rustup default stable && \
+  rustup update && \
   # Install VS Code
   wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg && \
   install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/ && \
   sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list' && \
   apt-get update && \
   apt-get install -y code && \
-  # Install Google Chrome
+  # Install Google Chrome (clean up duplicates first)
+  rm -f /etc/apt/sources.list.d/google-chrome.list && \
   wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-  sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' && \
+  sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list' && \
   apt-get update && \
   apt-get install -y google-chrome-stable && \
-  # Install gaming packages
-  apt-get install -y wine64 && \
+  # Install gaming packages and dependencies
+  apt-get install -y wine64 default-jre libgdk-pixbuf2.0-0 && \
   # Install development tools
   apt-get install -y rustc cargo && \
   # Clean up
@@ -97,8 +109,20 @@ RUN \
 
 RUN \
   echo "**** install additional development tools ****" && \
-  npm install -g yarn pnpm typescript ts-node nodemon && \
-  pip3 install --user pipenv virtualenv jupyter
+  npm install -g yarn pnpm typescript ts-node nodemon climmander && \
+  pip3 install --user pipenv virtualenv jupyter requests && \
+  # Install Rust tools with compatible versions
+  cargo install --locked cargo-edit@0.12.0 && \
+  cargo install --locked cargo-watch@8.4.0 && \
+  # Fix Steam permissions and cache issues
+  mkdir -p /home/user/.steam && \
+  chown -R 1000:1000 /home/user/.steam && \
+  # Create Steam cache directory with proper permissions
+  mkdir -p /home/user/.cache/steam && \
+  chown -R 1000:1000 /home/user/.cache/steam && \
+  # Set up update system
+  mkdir -p /home/user/.local/share/applications && \
+  chown -R 1000:1000 /home/user/.local
 
 RUN \
   echo "**** cleanup ****" && \
