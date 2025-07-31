@@ -5,7 +5,7 @@
 First start a new blank codespace by going to https://github.com/codespaces/ and choosing the "Blank" template. Then copy and paste this command in your codespace terminal and hit enter.
 
 ```bash
-curl -O https://raw.githubusercontent.com/your-username/MassiVM/main/install.sh
+curl -O https://raw.githubusercontent.com/genZrizzCode/MassiVM/main/install.sh
 chmod +x install.sh
 ./install.sh
 ```
@@ -114,7 +114,7 @@ After installation:
 
 ### License
 
-Apache License 2.0 - See [LICENSE](LICENSE) file for details.
+Apache License 2.0 - See [LICENSE](LICENSE.txt) file for details.
 
 **Key Terms:**
 - ✅ **Fork and PR freely** - No restrictions on contributions
