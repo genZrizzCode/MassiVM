@@ -81,18 +81,13 @@ RUN \
 
 RUN \
   echo "**** install additional packages ****" && \
-  # Install Rust with latest stable version
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable && \
-  . $HOME/.cargo/env && \
-  rustup default stable && \
-  rustup update && \
-  # Install VS Code
+  # Install VS Code (pre-compiled binary)
   wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg && \
   install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/ && \
   sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list' && \
   apt-get update && \
   apt-get install -y code && \
-  # Install Google Chrome (clean up duplicates first)
+  # Install Google Chrome (pre-compiled binary)
   rm -f /etc/apt/sources.list.d/google-chrome.list && \
   wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
   sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list' && \
@@ -100,8 +95,6 @@ RUN \
   apt-get install -y google-chrome-stable && \
   # Install gaming packages and dependencies
   apt-get install -y wine64 default-jre libgdk-pixbuf2.0-0 && \
-  # Install development tools
-  apt-get install -y rustc cargo && \
   # Clean up
   rm -f packages.microsoft.gpg
 
@@ -114,9 +107,10 @@ RUN \
   echo "**** install additional development tools ****" && \
   npm install -g yarn pnpm typescript ts-node nodemon climmander && \
   pip3 install --user pipenv virtualenv jupyter requests && \
-  # Install Rust tools with compatible versions
-  cargo install --locked cargo-edit@0.12.0 && \
-  cargo install --locked cargo-watch@8.4.0 && \
+  # Install pre-compiled Rust tools (much faster)
+  curl -L https://github.com/killercup/cargo-edit/releases/download/v0.12.0/cargo-edit-v0.12.0-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C /usr/local/bin/ && \
+  curl -L https://github.com/watchexec/cargo-watch/releases/download/v8.4.0/cargo-watch-v8.4.0-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C /usr/local/bin/ cargo-watch-v8.4.0-x86_64-unknown-linux-gnu/cargo-watch && \
+  chmod +x /usr/local/bin/cargo-edit /usr/local/bin/cargo-watch && \
   # Fix Steam permissions and cache issues
   mkdir -p /home/user/.steam && \
   chown -R 1000:1000 /home/user/.steam && \

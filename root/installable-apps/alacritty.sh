@@ -1,23 +1,10 @@
 #!/bin/bash
 echo "**** Installing Alacritty Terminal ****"
 
-# Install dependencies
-sudo apt-get update
-sudo apt-get install -y \
-    cmake \
-    pkg-config \
-    libfreetype6-dev \
-    libfontconfig1-dev \
-    libxcb-xfixes0-dev \
-    libxkbcommon-dev \
-    python3
-
-# Install Rust (required for Alacritty)
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-source ~/.cargo/env
-
-# Install Alacritty
-cargo install alacritty
+# Install pre-compiled Alacritty binary (much faster)
+curl -L https://github.com/alacritty/alacritty/releases/download/v0.15.1/alacritty-v0.15.1-ubuntu_20_04_amd64.deb -o /tmp/alacritty.deb
+dpkg -i /tmp/alacritty.deb || apt-get install -f -y
+rm /tmp/alacritty.deb
 
 # Create desktop entry
 mkdir -p ~/.local/share/applications
@@ -33,6 +20,6 @@ Categories=System;TerminalEmulator;
 EOF
 
 # Set as default terminal (optional)
-sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator ~/.cargo/bin/alacritty 50
+update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/alacritty 50
 
 echo "**** Alacritty Terminal installation completed ****" 
