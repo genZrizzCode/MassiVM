@@ -45,6 +45,9 @@ RUN \
     libxcb-render0-dev \
     libxcb-shape0-dev \
     libxcb-xfixes0-dev \
+    libssl-dev \
+    libssl3 \
+    openssl \
     && chmod +x /install-de.sh && \
     /install-de.sh
 
