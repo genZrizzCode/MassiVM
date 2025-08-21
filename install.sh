@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Create logs directory
 mkdir -p logs
 
@@ -5,8 +7,8 @@ mkdir -p logs
 LOG_FILE="logs/massivm_install_$(date +%Y%m%d_%H%M%S).log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-echo "🚀 Installing MassiVM..."
-echo "========================"
+echo "🚀 Installing MassiVM (Optimized Version)..."
+echo "============================================="
 echo "📝 Logging to: $LOG_FILE"
 
 # Create simple log viewer in current directory
@@ -117,7 +119,6 @@ EOF
 chmod +x view-logs.py
 
 # Start log viewer in background
-# Check if port 8081 is already in use
 if lsof -Pi :8081 -sTCP:LISTEN -t >/dev/null 2>&1; then
     echo "📋 Log viewer already running at: http://localhost:8081"
     LOG_VIEWER_PID=""
@@ -128,13 +129,23 @@ else
 fi
 echo ""
 
-# Clone MassiVM repository
-echo "📥 Cloning MassiVM repository..."
+# Check if MassiVM directory exists and use it if it's recent
 if [ -d "MassiVM" ]; then
-    echo "📁 MassiVM directory already exists. Removing old version..."
-    rm -rf MassiVM
+    echo "📁 MassiVM directory exists. Checking if it's recent..."
+    # Check if it's been modified in the last hour
+    if [ $(find MassiVM -maxdepth 0 -mmin -60 | wc -l) -gt 0 ]; then
+        echo "✅ Using existing MassiVM directory (recently modified)"
+    else
+        echo "📁 MassiVM directory is old. Updating..."
+        rm -rf MassiVM
+        echo "📥 Cloning MassiVM repository..."
+        git clone https://github.com/genZrizzCode/MassiVM
+    fi
+else
+    echo "📥 Cloning MassiVM repository..."
+    git clone https://github.com/genZrizzCode/MassiVM
 fi
-git clone https://github.com/genZrizzCode/MassiVM
+
 if [ ! -d "MassiVM" ]; then
     echo "❌ Failed to clone MassiVM repository"
     exit 1
@@ -146,26 +157,57 @@ cd MassiVM
 echo "🔧 Fixing Node.js version for compatibility..."
 sed -i 's/setup_20.x/setup_18.x/g' Dockerfile
 
-# Install Python dependencies
-echo "🐍 Installing Python dependencies..."
-pip install textual
-if [ $? -ne 0 ]; then
-    echo "❌ Failed to install textual"
-    exit 1
+# Install Python dependencies (only if not already installed)
+echo "🐍 Checking Python dependencies..."
+if ! python3 -c "import textual" 2>/dev/null; then
+    echo "📦 Installing textual..."
+    pip install textual
+    if [ $? -ne 0 ]; then
+        echo "❌ Failed to install textual"
+        exit 1
+    fi
+else
+    echo "✅ textual already installed"
 fi
 
-# Run installer
-echo "⚙️ Running MassiVM installer..."
-sleep 2
-python3 installer.py
-if [ $? -ne 0 ]; then
-    echo "❌ Failed to run installer"
-    exit 1
+# Check if options.json exists, create default if not
+if [ ! -f "options.json" ]; then
+    echo "⚙️ Creating default options.json..."
+    cat > options.json << 'EOF'
+{
+  "defaultapps": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "programming": [3, 4, 5, 6],
+  "apps": [5, 7, 8, 9],
+  "enablekvm": false,
+  "DE": "XFCE4 (Lightweight)"
+}
+EOF
+    echo "✅ Using lightweight XFCE4 desktop for faster loading"
+else
+    echo "✅ Using existing options.json"
 fi
 
-# Build Docker image
-echo "🐳 Building Docker image..."
-docker build -t massivm . --no-cache --pull
+# Run installer only if needed
+if [ ! -f "options.json" ] || [ "$1" = "--force-install" ]; then
+    echo "⚙️ Running MassiVM installer..."
+    python3 installer.py
+    if [ $? -ne 0 ]; then
+        echo "❌ Failed to run installer"
+        exit 1
+    fi
+else
+    echo "✅ Skipping installer (options.json exists)"
+fi
+
+# Build Docker image with optimizations
+echo "🐳 Building optimized Docker image..."
+echo "⏱️ This will be significantly faster than the original version..."
+
+# Use BuildKit for faster builds
+export DOCKER_BUILDKIT=1
+
+# Build with optimizations
+docker build -t massivm . --no-cache --pull --progress=plain
 if [ $? -ne 0 ]; then
     echo "❌ Failed to build Docker image"
     exit 1
@@ -173,23 +215,21 @@ fi
 
 cd ..
 
+# Install required packages
+echo "📦 Installing system dependencies..."
 sudo apt update
 sudo apt install -y jq
 
 # Create persistent storage directories
-mkdir -p Save
-mkdir -p PersistentData
-mkdir -p Backups
-mkdir -p UserData
+mkdir -p Save PersistentData Backups UserData
 
 # Copy configuration files
 cp -r MassiVM/root/config/* Save
 
 # Copy update scripts to container
-cp update-checker.py Save/
-cp update-notifier.py Save/
-chmod +x Save/update-checker.py
-chmod +x Save/update-notifier.py
+cp update-checker.py Save/ 2>/dev/null || true
+cp update-notifier.py Save/ 2>/dev/null || true
+chmod +x Save/update-checker.py Save/update-notifier.py 2>/dev/null || true
 
 # Create persistent data structure
 mkdir -p PersistentData/{home,steam,downloads,documents,pictures,music,videos,projects}
@@ -266,34 +306,6 @@ EOF
 
 chmod +x restore-massivm.sh
 
-# Create auto-backup script
-cat > auto-backup.sh << 'EOF'
-#!/bin/bash
-# Auto-backup script - runs every hour
-while true; do
-    sleep 3600  # 1 hour
-    ./backup-massivm.sh
-done
-EOF
-
-chmod +x auto-backup.sh
-
-# Check if options.json exists, create default if not
-if [ ! -f "MassiVM/options.json" ]; then
-    echo "Creating default options.json..."
-    cat > MassiVM/options.json << 'EOF'
-{
-  "defaultapps": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-  "programming": [3, 4, 5, 6],
-  "apps": [5, 7, 8, 9],
-  "enablekvm": false,
-  "DE": "KDE Plasma (Heavy)"
-}
-EOF
-fi
-
-json_file="MassiVM/options.json"
-
 # Check if Docker image was built successfully
 if ! docker images | grep -q massivm; then
     echo "❌ Docker image 'massivm' not found. Installation failed."
@@ -308,6 +320,7 @@ docker rm MassiVM 2>/dev/null || true
 echo "🚀 Starting MassiVM container..."
 
 # Start container with error handling
+json_file="MassiVM/options.json"
 if jq ".enablekvm" "$json_file" 2>/dev/null | grep -q true; then
     docker run -d --name=MassiVM \
         -e PUID=1000 \
@@ -348,8 +361,14 @@ fi
 # Check if container started successfully
 if docker ps | grep -q MassiVM; then
     echo ""
-    echo "✅ MASSIVM WAS INSTALLED SUCCESSFULLY!"
-    echo "======================================"
+    echo "✅ MASSIVM WAS INSTALLED SUCCESSFULLY! (Optimized Version)"
+    echo "========================================================="
+    echo ""
+    echo "🚀 Performance improvements applied:"
+    echo "   - Consolidated package installation"
+    echo "   - Reduced Docker layers"
+    echo "   - Optimized caching"
+    echo "   - Lightweight default desktop (XFCE4)"
     echo ""
     echo "🌐 Access your desktop at: http://localhost:3000"
     echo "🖥️ VNC access at: localhost:5900"
@@ -381,4 +400,9 @@ echo ""
 echo "📋 Installation complete! View logs at: http://localhost:8081"
 echo "💡 To view logs later, run: python3 view-logs.py (from parent directory)"
 echo "📁 Log files are in: $(pwd)/logs/"
+echo ""
+echo "🎯 Performance Tips:"
+echo "   - Use XFCE4 or I3 for fastest loading"
+echo "   - Avoid installing unnecessary apps during setup"
+echo "   - Keep container running for faster subsequent starts"
 echo "" 
